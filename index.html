@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Veículos Disponíveis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col selection:bg-rose-600 selection:text-white">
+
+    <header class="bg-zinc-900/90 backdrop-blur-md text-white shadow-2xl border-b border-rose-950/60 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-rose-600 p-2.5 rounded-xl shadow-lg shadow-rose-950/50 flex items-center justify-center">
+                    <i class="fa-solid fa-car-side text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-zinc-100 flex items-center gap-2">
+                        Gestão de Veículos
+                        <span id="sync-badge" class="text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Em Rede (Ao Vivo)
+                        </span>
+                    </h1>
+                    <p class="text-xs text-rose-400 font-medium" id="current-date-label">Sincronizado na nuvem</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3 w-full md:w-auto justify-end flex-wrap gap-2 print:hidden">
+                <button onclick="openModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2.5 rounded-xl shadow-lg shadow-rose-900/40 transition duration-200 flex items-center space-x-2 text-sm w-full md:w-auto justify-center">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Novo Veículo</span>
+                </button>
+                <button onclick="printTable()" class="bg-zinc-950 hover:bg-zinc-800 text-rose-300 border border-rose-900/40 px-3.5 py-2.5 rounded-xl transition text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Imprimir</span>
+                </button>
+                <button onclick="exportData()" class="bg-zinc-950 hover:bg-zinc-800 text-rose-300 border border-rose-900/40 px-3.5 py-2.5 rounded-xl transition text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-file-excel"></i>
+                    <span>Excel</span>
+                </button>
+                <button onclick="resetDefaultData()" class="bg-zinc-950 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-zinc-800 px-3 py-2.5 rounded-xl transition text-sm" title="Restaurar Dados Originais">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 print:hidden">
+            <div class="bg-zinc-900 p-5 rounded-2xl shadow-lg border border-rose-950/80 flex items-center space-x-4">
+                <div class="bg-rose-950/80 text-rose-400 border border-rose-800/40 p-3.5 rounded-xl text-xl">
+                    <i class="fa-solid fa-car"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Total de Veículos</p>
+                    <h3 class="text-2xl font-bold text-zinc-100" id="stat-total">0</h3>
+                </div>
+            </div>
+
+            <div class="bg-zinc-900 p-5 rounded-2xl shadow-lg border border-rose-950/80 flex items-center space-x-4">
+                <div class="bg-emerald-950/80 text-emerald-400 border border-emerald-800/40 p-3.5 rounded-xl text-xl">
+                    <i class="fa-solid fa-tag"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Média Preço Venda</p>
+                    <h3 class="text-xl font-bold text-zinc-100" id="stat-avg-price">R$ 0,00</h3>
+                </div>
+            </div>
+
+            <div class="bg-zinc-900 p-5 rounded-2xl shadow-lg border border-rose-950/80 flex items-center space-x-4">
+                <div class="bg-rose-900/40 text-rose-400 border border-rose-700/40 p-3.5 rounded-xl text-xl">
+                    <i class="fa-solid fa-handshake-simple"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Total de Repasses</p>
+                    <h3 class="text-2xl font-bold text-zinc-100" id="stat-repasse">0</h3>
+                </div>
+            </div>
+
+            <div class="bg-zinc-900 p-5 rounded-2xl shadow-lg border border-rose-950/80 flex items-center space-x-4">
+                <div class="bg-purple-950/80 text-purple-400 border border-purple-800/40 p-3.5 rounded-xl text-xl">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Consignados</p>
+                    <h3 class="text-2xl font-bold text-zinc-100" id="stat-consignados">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-zinc-900 p-4 rounded-2xl shadow-lg border border-rose-950 flex flex-col md:flex-row justify-between items-center gap-4 print:hidden">
+            <div class="relative w-full md:w-96">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-zinc-500">
+                    <i class="fa-solid fa-search"></i>
+                </span>
+                <input type="text" id="search-input" oninput="filterVehicles()" placeholder="Pesquisar por veículo, placa, cor, proprietário..." class="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-600 focus:border-rose-600 placeholder-zinc-500 transition">
+            </div>
+
+            <div class="flex items-center space-x-3 w-full md:w-auto justify-end flex-wrap gap-y-2">
+                <select id="filter-proprietario" onchange="filterVehicles()" class="bg-zinc-950 border border-rose-950 text-zinc-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    <option value="">Proprietário / Tipo</option>
+                    <option value="CONSIGNADO">Consignado</option>
+                    <option value="RENATO">Renato</option>
+                    <option value="RAFAEL">Rafael</option>
+                </select>
+
+                <select id="filter-options" onchange="filterVehicles()" class="bg-zinc-950 border border-rose-950 text-zinc-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    <option value="">Todas as Opções</option>
+                    <option value="COMPLETO">Completo</option>
+                    <option value="BÁSICO">Básico</option>
+                    <option value="C/ AR">C/ Ar</option>
+                    <option value="D/ Hidráulica">D/ Hidráulica</option>
+                </select>
+
+                <select id="filter-repasse" onchange="filterVehicles()" class="bg-zinc-950 border border-rose-950 text-zinc-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    <option value="">Status Repasse</option>
+                    <option value="with">Marcado como Repasse</option>
+                    <option value="without">Sem Repasse</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="bg-zinc-900 rounded-2xl shadow-xl border border-rose-950/80 overflow-hidden print:border-none print:shadow-none">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-rose-950/80 text-rose-200 text-xs uppercase tracking-wider font-semibold border-b border-rose-900/70">
+                            <th class="py-3.5 px-4 text-center w-12">#</th>
+                            <th class="py-3.5 px-4">Veículo <span class="text-[10px] text-
+                                                              <div id="vehicle-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-zinc-900 rounded-2xl shadow-2xl border border-rose-900/80 w-full max-w-xl overflow-hidden transform transition-all">
+            <div class="bg-rose-950 text-rose-100 px-6 py-4 flex justify-between items-center border-b border-rose-900/60">
+                <h3 id="modal-title" class="font-bold text-lg">Adicionar Novo Veículo</h3>
+                <button onclick="closeModal()" class="text-rose-400 hover:text-white transition text-lg p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="vehicle-form" onsubmit="saveVehicle(event)" class="p-6 space-y-4">
+                <input type="hidden" id="vehicle-id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Nome do Veículo *</label>
+                        <input type="text" id="input-veiculo" required placeholder="Ex: HONDA BIZ 125 ES" oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Ano (Fab/Modelo) *</label>
+                        <input type="text" id="input-ano" required placeholder="2013/2014 ou 2025" maxlength="9" oninput="formatAnoInput(this)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Cor *</label>
+                        <input type="text" id="input-cor" required placeholder="Ex: BRANCA / PRETA" oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Placa *</label>
+                        <input type="text" id="input-placa" maxlength="7" placeholder="Ex: ABC1D23" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Opções *</label>
+                        <select id="input-opcionas-select" onchange="handleOpcionasSelectChange(this.value)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
+                            <option value="COMPLETO">COMPLETO</option>
+                            <option value="BÁSICO">BÁSICO</option>
+                            <option value="C/ AR">C/ AR</option>
+                            <option value="D/ HIDRÁULICA">D/ HIDRÁULICA</option>
+                            <option value="OUTRO">OUTRO (DIGITAR)...</option>
+                        </select>
+                        <input type="text" id="input-opcionas-custom" placeholder="Digite as opções..." oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600 mt-2 hidden">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Proprietário *</label>
+                        <select id="input-proprietario" required class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
+                            <option value="RENATO">RENATO</option>
+                            <option value="RAFAEL">RAFAEL</option>
+                            <option value="CONSIGNADO">CONSIGNADO</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Quilometragem (KM)</label>
+                        <input type="text" id="input-km" placeholder="Ex: 114.200 ou ZERADO" oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Valor FIPE (R$) *</label>
+                        <input type="text" id="input-fipe" required placeholder="0,00" oninput="formatCurrencyInput(this)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Preço de Venda (R$) *</label>
+                        <input type="text" id="input-preco" required placeholder="0,00" oninput="formatCurrencyInput(this)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    </div>
+
+                    <div class="md:col-span-2 bg-zinc-950 border border-rose-950 rounded-xl p-3.5 flex items-center justify-between">
+                        <div>
+                            <span class="block text-sm font-semibold text-zinc-200">Veículo em Repasse?</span>
+                            <span class="text-xs text-zinc-400">Marque esta opção para indicar repasse.</span>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="input-is-repasse" onchange="toggleRepasseInput(this.checked)" class="sr-only peer">
+                            <div class="w-11 h-6 bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-600"></div>
+                        </label>
+                    </div>
+
+                    <div id="container-repasse-val" class="md:col-span-2 hidden">
+                        <label class="block text-xs font-semibold text-rose-400 uppercase mb-1">Valor do Repasse (R$)</label>
+                        <input type="text" id="input-repasse" placeholder="0,00" oninput="formatCurrencyInput(this)" class="w-full bg-zinc-950 border border-rose-800 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-zinc-800">
+                    <button type="button" onclick="closeModal()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium px-4 py-2.5 rounded-xl transition text-sm">Cancelar</button>
+                    <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-5 py-2.5 rounded-xl shadow transition text-sm">Salvar Veículo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="ad-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-zinc-900 rounded-2xl shadow-2xl border border-rose-900/80 w-full max-w-2xl overflow-hidden transform transition-all">
+            <div class="bg-rose-950 text-rose-100 px-6 py-4 flex justify-between items-center border-b border-rose-900/60">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-bullhorn text-rose-400"></i>
+                    <h3 class="font-bold text-lg" id="ad-modal-title">Anúncio do Veículo</h3>
+                </div>
+                <button onclick="closeAdModal()" class="text-rose-400 hover:text-white transition text-lg p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div class="flex items-center justify-between text-xs text-zinc-400 bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+                    <span>Copie o texto para postar nas redes sociais/WhatsApp.</span>
+                    <button onclick="copyAdText()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
+                        <i class="fa-solid fa-copy"></i>
+                        <span>Copiar Texto</span>
+                    </button>
+                </div>
+
+                <textarea id="ad-text-area" rows="12" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 p-4 rounded-xl text-sm font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-rose-600"></textarea>
+
+                <div class="flex justify-between items-center pt-2">
+                    <button onclick="saveAdTemplateCustom()" class="text-xs text-rose-400 hover:text-rose-300 font-medium">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i>Salvar alterações neste anúncio
+                    </button>
+                    <button onclick="closeAdModal()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-4 py-2 rounded-xl text-sm font-medium">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-alert" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-zinc-900 border border-rose-900 rounded-2xl shadow-xl max-w-sm w-full p-6 text-center space-y-4">
+            <div id="alert-icon" class="w-12 h-12 bg-rose-950 text-rose-400 border border-rose-800 rounded-full flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-info"></i>
+            </div>
+            <h4 id="alert-title" class="font-bold text-lg text-zinc-100">Aviso</h4>
+            <p id="alert-message" class="text-sm text-zinc-400">Mensagem aqui...</p>
+            <button onclick="closeAlert()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-2.5 rounded-xl transition text-sm">Entendido</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'revenda-veiculos-app-v2';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        let db = null, auth = null;
+
+        const defaultVehicles = [
+            { id: 1, veiculo: "GM CELTA 1.0 SUPER 3P - REPASSE", ano: "2003/2004", cor: "BRANCO", placa: "ILO7C62", fipe: 13755, preco: 15900, repasse: 15900, isRepasse: true, opcionas: "BÁSICO", proprietario: "RENATO", km: "", adCustom: "" },
+            { id: 2, veiculo: "GM CELTA 1.0 SPIRIT 4P - REPASSE", ano: "2005/2005", cor: "BRANCA", placa: "IMG8I16", fipe: 16736, preco: 17900, repasse: 17900, isRepasse: true, opcionas: "BÁSICO", proprietario: "RENATO", km: "219.150", adCustom: "" },
+            { id: 3, veiculo: "CORSA SEDAN CLASSIC 1.0 - REPASSE", ano: "2008/2008", cor: "BRANCO", placa: "IOU6277", fipe: 17921, preco: 18900, repasse: 18900, isRepasse: true, opcionas: "C/ AR", proprietario: "RENATO", km: "", adCustom: "" },
+            { id: 4, veiculo: "FORD/COURIER L 1.6 FLEX", ano: "2009/2009", cor: "BRANCA", placa: "IPO7D36", fipe: 31316, preco: 28900, repasse: 28900, isRepasse: true, opcionas: "D/ Hidráulica", proprietario: "RENATO", km: "", adCustom: "" },
+            { id: 5, veiculo: "FIAT/SIENA 1.4 ELX FIRE 8V", ano: "2008/2009", cor: "PRETA", placa: "MFF9736", fipe: 26396, preco: 30900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "111.700", adCustom: "" },
+            { id: 6, veiculo: "UNO VIVACE 1.0", ano: "2010/2011", cor: "BRANCO", placa: "IQW8C23", fipe: 27739, preco: 32900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "109.000", adCustom: "" },
+            { id: 7, veiculo: "UNO VIVACE 1.0 5P", ano: "2011/2012", cor: "PRATA", placa: "HHU5867", fipe: 29044, preco: 32900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "110.200", adCustom: "" },
+            { id: 8, veiculo: "GM/CORSA SEDAN 1.4 8V PREMIUM", ano: "2009/2010", cor: "VERDE", placa: "IQG7G38", fipe: 29653, preco: 33900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "127.000", adCustom: "" },
+            { id: 9, veiculo: "GM/CELTA 1.0 LT 8V", ano: "2011/2012", cor: "VERMELHO", placa: "", fipe: 30156, preco: 33900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "102.700", adCustom: "" },
+            { id: 10, veiculo: "RENAULT/SANDERO STEPWAY 1.6", ano: "2009/2009", cor: "VERMELHA", placa: "MGG7A84", fipe: 31494, preco: 34900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "122.000", adCustom: "" },
+            { id: 11, veiculo: "GM/PRISMA 1.4 MAXX", ano: "2010/2011", cor: "PRATA", placa: "IQV4D47", fipe: 29046, preco: 34900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "100.350", adCustom: "" },
+            { id: 12, veiculo: "FIAT/PUNTO 1.4 FIRE 8V", ano: "2009/2009", cor: "BRANCA", placa: "IPB6D84", fipe: 28966, preco: 35900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "142.000", adCustom: "" },
+            { id: 13, veiculo: "GM/MERIVA 1.4 MAXX", ano: "2011/2012", cor: "BRANCA", placa: "ISD3623", fipe: 30898, preco: 35900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "115.000", adCustom: "" },
+            { id: 14, veiculo: "VW/FOX EXTREME 1.6 8V", ano: "2008/2009", cor: "VERMELHA", placa: "IOZ0161", fipe: 31296, preco: 37900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "157.000", adCustom: "" },
+            { id: 15, veiculo: "CELTA 1.0 LT 5P", ano: "2013/2014", cor: "BRANCO", placa: "IUS5H52", fipe: 33180, preco: 37900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "114.470", adCustom: "" },
+            { id: 16, veiculo: "FORD/ECOSPORT 1.6 XLT 8V 5P", ano: "2009/2009", cor: "PRETA", placa: "MGT5C15", fipe: 33920, preco: 38900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "", adCustom: "" },
+            { id: 17, veiculo: "UNO WAY 1.4", ano: "2013/2014", cor: "BRANCO", placa: "MLT9E94", fipe: 37720, preco: 42900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "107.234", adCustom: "" },
+            { id: 18, veiculo: "VW/FOX 1.6 BLUEM GII", ano: "2012/2013", cor: "BRANCA", placa: "ITJ6876", fipe: 40295, preco: 42900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "121.000", adCustom: "" },
+            { id: 19, veiculo: "GRAND SIENA ATTRACTIVE 1.4", ano: "2014/2014", cor: "PRATA", placa: "MMC7E43", fipe: 37823, preco: 42900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "115.000", adCustom: "" },
+            { id: 20, veiculo: "ASTRA 2.0 ADVANTAGE", ano: "2010/2010", cor: "PRETO", placa: "IQN8I67", fipe: 38386, preco: 43900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "128.500", adCustom: "" },
+            { id: 21, veiculo: "VW/SPACEFOX 1.6 TREND 8V", ano: "2013/2013", cor: "PRATA", placa: "OBH9G18", fipe: 39357, preco: 44900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "120.000", adCustom: "" },
+            { id: 22, veiculo: "VW/GOL 1.6 CITY 8V", ano: "2014/2014", cor: "PRATA", placa: "MLK9722", fipe: 39091, preco: 44900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "89.000", adCustom: "" },
+            { id: 23, veiculo: "GM/ONIX 1.0 LT 8V", ano: "2013/2014", cor: "VERMELHA", placa: "IVB7I39", fipe: 41303, preco: 45900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "105.300", adCustom: "" },
+            { id: 24, veiculo: "HONDA/FIT 1.4 LXL MANUAL", ano: "2009/2009", cor: "CINZA", placa: "MIX0F90", fipe: 40685, preco: 46900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "112.000", adCustom: "" },
+            { id: 25, veiculo: "NISSAN/TIIDA SL 1.8 AUT.", ano: "2012/2012", cor: "PRATA", placa: "AHC2C29", fipe: 41105, preco: 47900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "119.400", adCustom: "" },
+            { id: 26, veiculo: "VW/POLO 1.6 SEDAN 8V", ano: "2014/2014", cor: "BRANCA", placa: "MLH2349", fipe: 44714, preco: 48900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "102.000", adCustom: "" },
+            { id: 27, veiculo: "TOYOTA/ETIOS XS 1.5 16V MAN", ano: "2014/2015", cor: "BRANCO", placa: "IWI2B03", fipe: 43913, preco: 49900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "126.240", adCustom: "" },
+            { id: 28, veiculo: "TOYOTA/ETIOS X 1.3 16V MAN.", ano: "2015/2016", cor: "AZUL", placa: "NEG0847", fipe: 46417, preco: 49900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "110.700", adCustom: "" },
+            { id: 29, veiculo: "GM/JOY PLUS 1.0 MAN", ano: "2020/2020", cor: "BRANCO", placa: "IZX7F35", fipe: 47985, preco: 54900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "98.100", adCustom: "" },
+            { id: 30, veiculo: "HONDA/CITY LX 1.5 16V", ano: "2012/2013", cor: "PRETA", placa: "ACG7E07", fipe: 52144, preco: 56900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "159.000", adCustom: "" },
+            { id: 31, veiculo: "HONDA CIVIC 1.8 LXL AUT", ano: "2011/2011", cor: "PRETO", placa: "ISD2U55", fipe: 55651, preco: 59900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "122.000", adCustom: "" },
+            { id: 32, veiculo: "RENAULT DUSTER EXPRESSION 1.6 16V", ano: "2013/2014", cor: "BRANCA", placa: "INM5F96", fipe: 49359, preco: 59900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "91.100", adCustom: "" },
+            { id: 33, veiculo: "KIA CERATO SX3 1.6ATHD", ano: "2012/2013", cor: "BRANCA", placa: "ODD9I58", fipe: 56052, preco: 61900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "119.000", adCustom: "" },
+            { id: 34, veiculo: "CHEV/SPIN 1.8L AT LTZ 7 LUGARES", ano: "2015/2015", cor: "BRANCA", placa: "IXD2E48", fipe: 57046, preco: 62900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "110.000", adCustom: "" },
+            { id: 35, veiculo: "HONDA/FIT EX FLEX", ano: "2013/2014", cor: "BRANCA", placa: "MLD8C48", fipe: 56934, preco: 64900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "100.000", adCustom: "" },
+            { id: 36, veiculo: "GM/ONIX 1.0 12V", ano: "2023/2024", cor: "BRANCA", placa: "JCF6J03", fipe: 69824, preco: 71900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "117.000", adCustom: "" },
+            { id: 37, veiculo: "KICKS SV 1.6 AUT", ano: "2020/2021", cor: "BRANCO", placa: "JAN2E81", fipe: 85960, preco: 85900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "74.945", adCustom: "" },
+            { id: 38, veiculo: "FIAT/FIORINO ENDURANCE 1.4 8V", ano: "2022/2022", cor: "BRANCA", placa: "JDE5H21", fipe: 79686, preco: 86900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "49.000", adCustom: "" },
+            { id: 39, veiculo: "CRUZE SPORT LTZ 1.4 AUT / VECTRA", ano: "2016/2017", cor: "AZUL", placa: "FTI5I60", fipe: 84614, preco: 100900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "ZERADO", adCustom: "" },
+            { id: 40,
