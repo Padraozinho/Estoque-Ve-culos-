@@ -31,10 +31,10 @@
                     <h1 class="text-xl font-bold tracking-tight text-zinc-100 flex items-center gap-2">
                         Gestão de Veículos
                         <span id="sync-badge" class="text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-800/60 font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Em Rede (Ao Vivo)
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sistema Ativo
                         </span>
                     </h1>
-                    <p class="text-xs text-rose-400 font-medium" id="current-date-label">Sincronizado na nuvem</p>
+                    <p class="text-xs text-rose-400 font-medium" id="current-date-label">Atualizado</p>
                 </div>
             </div>
             
@@ -51,7 +51,7 @@
                     <i class="fa-solid fa-file-excel"></i>
                     <span>Excel</span>
                 </button>
-                <button onclick="resetDefaultData()" class="bg-zinc-950 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-zinc-800 px-3 py-2.5 rounded-xl transition text-sm" title="Restaurar Dados Originais">
+                <button onclick="resetDefaultData()" class="bg-zinc-950 hover:bg-zinc-800 text-zinc-400 hover:text-rose-400 border border-zinc-800 px-3 py-2.5 rounded-xl transition text-sm" title="Restaurar Lista Padrão">
                     <i class="fa-solid fa-rotate-right"></i>
                 </button>
             </div>
@@ -106,26 +106,26 @@
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-zinc-500">
                     <i class="fa-solid fa-search"></i>
                 </span>
-                <input type="text" id="search-input" oninput="filterVehicles()" placeholder="Pesquisar por veículo, placa, cor, proprietário..." class="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-600 focus:border-rose-600 placeholder-zinc-500 transition">
+                <input type="text" id="search-input" oninput="filterVehicles()" placeholder="Pesquisar veículo, placa, cor..." class="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
             </div>
 
             <div class="flex items-center space-x-3 w-full md:w-auto justify-end flex-wrap gap-y-2">
-                <select id="filter-proprietario" onchange="filterVehicles()" class="bg-zinc-950 border border-rose-950 text-zinc-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-600">
+                <select id="filter-proprietario" onchange="filterVehicles()" class="bg-zinc-950 border border-rose-950 text-zinc-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none">
                     <option value="">Proprietário / Tipo</option>
                     <option value="CONSIGNADO">Consignado</option>
                     <option value="RENATO">Renato</option>
                     <option value="RAFAEL">Rafael</option>
                 </select>
 
-                <select id="filter-options" onchange="filterVehicles()" class="bg-zinc-950 border border-rose-950 text-zinc-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-600">
+                <select id="filter-options" onchange="filterVehicles()" class="bg-zinc-950 border border-rose-950 text-zinc-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none">
                     <option value="">Todas as Opções</option>
                     <option value="COMPLETO">Completo</option>
                     <option value="BÁSICO">Básico</option>
                     <option value="C/ AR">C/ Ar</option>
-                    <option value="D/ Hidráulica">D/ Hidráulica</option>
+                    <option value="D/ HIDRÁULICA">D/ Hidráulica</option>
                 </select>
 
-                <select id="filter-repasse" onchange="filterVehicles()" class="bg-zinc-950 border border-rose-950 text-zinc-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-rose-600">
+                <select id="filter-repasse" onchange="filterVehicles()" class="bg-zinc-950 border border-rose-950 text-zinc-200 text-sm rounded-xl px-3 py-2.5 focus:outline-none">
                     <option value="">Status Repasse</option>
                     <option value="with">Marcado como Repasse</option>
                     <option value="without">Sem Repasse</option>
@@ -133,18 +133,48 @@
             </div>
         </div>
 
-        <div class="bg-zinc-900 rounded-2xl shadow-xl border border-rose-950/80 overflow-hidden print:border-none print:shadow-none">
+        <div class="bg-zinc-900 rounded-2xl shadow-xl border border-rose-950/80 overflow-hidden print:border-none">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-rose-950/80 text-rose-200 text-xs uppercase tracking-wider font-semibold border-b border-rose-900/70">
                             <th class="py-3.5 px-4 text-center w-12">#</th>
-                            <th class="py-3.5 px-4">Veículo <span class="text-[10px] text-
-                                                              <div id="vehicle-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-zinc-900 rounded-2xl shadow-2xl border border-rose-900/80 w-full max-w-xl overflow-hidden transform transition-all">
+                            <th class="py-3.5 px-4">Veículo</th>
+                            <th class="py-3.5 px-4 text-center">Ano</th>
+                            <th class="py-3.5 px-4 text-center">Cor</th>
+                            <th class="py-3.5 px-4 text-center">Placa</th>
+                            <th class="py-3.5 px-4 text-right">Fipe</th>
+                            <th class="py-3.5 px-4 text-right cursor-pointer hover:bg-rose-900/60 transition" onclick="toggleSortPrice()">
+                                Preço <i id="sort-icon" class="fa-solid fa-arrow-up-wide-short text-rose-400 ml-1"></i>
+                            </th>
+                            <th class="py-3.5 px-4 text-right">Repasse</th>
+                            <th class="py-3.5 px-4 text-center">Opções</th>
+                            <th class="py-3.5 px-4 text-center">Proprietário</th>
+                            <th class="py-3.5 px-4 text-right">KM</th>
+                            <th class="py-3.5 px-4 text-center w-28 print:hidden">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehicle-table-body" class="divide-y divide-zinc-800/60 text-sm text-zinc-200">
+                    </tbody>
+                </table>
+            </div>
+            <div id="no-results" class="hidden py-12 text-center">
+                <i class="fa-solid fa-face-sad-tear text-rose-900/60 text-4xl mb-2"></i>
+                <p class="text-zinc-500 font-medium">Nenhum veículo encontrado.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-zinc-950 border-t border-rose-950/60 py-4 mt-auto print:hidden">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-zinc-500">
+            Sistema de Gestão de Veículos &bull; Clique no nome do veículo para abrir o Anúncio
+        </div>
+    </footer>
+    <div id="vehicle-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-zinc-900 rounded-2xl shadow-2xl border border-rose-900/80 w-full max-w-xl overflow-hidden">
             <div class="bg-rose-950 text-rose-100 px-6 py-4 flex justify-between items-center border-b border-rose-900/60">
                 <h3 id="modal-title" class="font-bold text-lg">Adicionar Novo Veículo</h3>
-                <button onclick="closeModal()" class="text-rose-400 hover:text-white transition text-lg p-1">
+                <button type="button" onclick="closeModal()" class="text-rose-400 hover:text-white transition text-2xl px-2 py-1">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -159,34 +189,34 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Ano (Fab/Modelo) *</label>
-                        <input type="text" id="input-ano" required placeholder="2013/2014 ou 2025" maxlength="9" oninput="formatAnoInput(this)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600">
+                        <input type="text" id="input-ano" required placeholder="2013/2014" maxlength="9" oninput="formatAnoInput(this)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Cor *</label>
-                        <input type="text" id="input-cor" required placeholder="Ex: BRANCA / PRETA" oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600">
+                        <input type="text" id="input-cor" required placeholder="BRANCA / PRETA" oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Placa *</label>
-                        <input type="text" id="input-placa" maxlength="7" placeholder="Ex: ABC1D23" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-rose-600">
+                        <input type="text" id="input-placa" maxlength="7" placeholder="ABC1D23" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-rose-600">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Opções *</label>
-                        <select id="input-opcionas-select" onchange="handleOpcionasSelectChange(this.value)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
+                        <select id="input-opcionas-select" onchange="handleOpcionasSelectChange(this.value)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none">
                             <option value="COMPLETO">COMPLETO</option>
                             <option value="BÁSICO">BÁSICO</option>
                             <option value="C/ AR">C/ AR</option>
                             <option value="D/ HIDRÁULICA">D/ HIDRÁULICA</option>
-                            <option value="OUTRO">OUTRO (DIGITAR)...</option>
+                            <option value="OUTRO">OUTRO...</option>
                         </select>
-                        <input type="text" id="input-opcionas-custom" placeholder="Digite as opções..." oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600 mt-2 hidden">
+                        <input type="text" id="input-opcionas-custom" placeholder="Digite as opções..." oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase mt-2 hidden">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Proprietário *</label>
-                        <select id="input-proprietario" required class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
+                        <select id="input-proprietario" required class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none">
                             <option value="RENATO">RENATO</option>
                             <option value="RAFAEL">RAFAEL</option>
                             <option value="CONSIGNADO">CONSIGNADO</option>
@@ -195,23 +225,23 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Quilometragem (KM)</label>
-                        <input type="text" id="input-km" placeholder="Ex: 114.200 ou ZERADO" oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-rose-600">
+                        <input type="text" id="input-km" placeholder="114.200 ou ZERADO" oninput="this.value = this.value.toUpperCase()" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm uppercase focus:outline-none">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Valor FIPE (R$) *</label>
-                        <input type="text" id="input-fipe" required placeholder="0,00" oninput="formatCurrencyInput(this)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
+                        <input type="text" id="input-fipe" required placeholder="0,00" oninput="formatCurrencyInput(this)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none">
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-zinc-400 uppercase mb-1">Preço de Venda (R$) *</label>
-                        <input type="text" id="input-preco" required placeholder="0,00" oninput="formatCurrencyInput(this)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
+                        <input type="text" id="input-preco" required placeholder="0,00" oninput="formatCurrencyInput(this)" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none">
                     </div>
 
                     <div class="md:col-span-2 bg-zinc-950 border border-rose-950 rounded-xl p-3.5 flex items-center justify-between">
                         <div>
                             <span class="block text-sm font-semibold text-zinc-200">Veículo em Repasse?</span>
-                            <span class="text-xs text-zinc-400">Marque esta opção para indicar repasse.</span>
+                            <span class="text-xs text-zinc-400">Marque para indicar repasse.</span>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="input-is-repasse" onchange="toggleRepasseInput(this.checked)" class="sr-only peer">
@@ -221,26 +251,26 @@
 
                     <div id="container-repasse-val" class="md:col-span-2 hidden">
                         <label class="block text-xs font-semibold text-rose-400 uppercase mb-1">Valor do Repasse (R$)</label>
-                        <input type="text" id="input-repasse" placeholder="0,00" oninput="formatCurrencyInput(this)" class="w-full bg-zinc-950 border border-rose-800 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-600">
+                        <input type="text" id="input-repasse" placeholder="0,00" oninput="formatCurrencyInput(this)" class="w-full bg-zinc-950 border border-rose-800 text-zinc-100 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none">
                     </div>
                 </div>
 
                 <div class="flex justify-end space-x-3 pt-4 border-t border-zinc-800">
-                    <button type="button" onclick="closeModal()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium px-4 py-2.5 rounded-xl transition text-sm">Cancelar</button>
-                    <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-5 py-2.5 rounded-xl shadow transition text-sm">Salvar Veículo</button>
+                    <button type="button" onclick="closeModal()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium px-4 py-2.5 rounded-xl text-sm">Cancelar</button>
+                    <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-5 py-2.5 rounded-xl text-sm">Salvar Veículo</button>
                 </div>
             </form>
         </div>
     </div>
 
     <div id="ad-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-zinc-900 rounded-2xl shadow-2xl border border-rose-900/80 w-full max-w-2xl overflow-hidden transform transition-all">
+        <div class="bg-zinc-900 rounded-2xl shadow-2xl border border-rose-900/80 w-full max-w-2xl overflow-hidden">
             <div class="bg-rose-950 text-rose-100 px-6 py-4 flex justify-between items-center border-b border-rose-900/60">
                 <div class="flex items-center space-x-2">
                     <i class="fa-solid fa-bullhorn text-rose-400"></i>
                     <h3 class="font-bold text-lg" id="ad-modal-title">Anúncio do Veículo</h3>
                 </div>
-                <button onclick="closeAdModal()" class="text-rose-400 hover:text-white transition text-lg p-1">
+                <button type="button" onclick="closeAdModal()" class="text-rose-400 hover:text-white transition text-2xl px-2 py-1">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -248,49 +278,30 @@
             <div class="p-6 space-y-4">
                 <div class="flex items-center justify-between text-xs text-zinc-400 bg-zinc-950 p-3 rounded-xl border border-zinc-800">
                     <span>Copie o texto para postar nas redes sociais/WhatsApp.</span>
-                    <button onclick="copyAdText()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
+                    <button type="button" onclick="copyAdText()" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
                         <i class="fa-solid fa-copy"></i>
                         <span>Copiar Texto</span>
                     </button>
                 </div>
 
-                <textarea id="ad-text-area" rows="12" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 p-4 rounded-xl text-sm font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-rose-600"></textarea>
+                <textarea id="ad-text-area" rows="12" class="w-full bg-zinc-950 border border-rose-950 text-zinc-100 p-4 rounded-xl text-sm font-mono leading-relaxed focus:outline-none"></textarea>
 
                 <div class="flex justify-between items-center pt-2">
-                    <button onclick="saveAdTemplateCustom()" class="text-xs text-rose-400 hover:text-rose-300 font-medium">
+                    <button type="button" onclick="saveAdTemplateCustom()" class="text-xs text-rose-400 hover:text-rose-300 font-medium">
                         <i class="fa-solid fa-floppy-disk mr-1"></i>Salvar alterações neste anúncio
                     </button>
-                    <button onclick="closeAdModal()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-4 py-2 rounded-xl text-sm font-medium">Fechar</button>
+                    <button type="button" onclick="closeAdModal()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-4 py-2 rounded-xl text-sm font-medium">Fechar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="custom-alert" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-zinc-900 border border-rose-900 rounded-2xl shadow-xl max-w-sm w-full p-6 text-center space-y-4">
-            <div id="alert-icon" class="w-12 h-12 bg-rose-950 text-rose-400 border border-rose-800 rounded-full flex items-center justify-center mx-auto text-xl">
-                <i class="fa-solid fa-info"></i>
-            </div>
-            <h4 id="alert-title" class="font-bold text-lg text-zinc-100">Aviso</h4>
-            <p id="alert-message" class="text-sm text-zinc-400">Mensagem aqui...</p>
-            <button onclick="closeAlert()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-2.5 rounded-xl transition text-sm">Entendido</button>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'revenda-veiculos-app-v2';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-        let db = null, auth = null;
-
+    <script>
         const defaultVehicles = [
             { id: 1, veiculo: "GM CELTA 1.0 SUPER 3P - REPASSE", ano: "2003/2004", cor: "BRANCO", placa: "ILO7C62", fipe: 13755, preco: 15900, repasse: 15900, isRepasse: true, opcionas: "BÁSICO", proprietario: "RENATO", km: "", adCustom: "" },
             { id: 2, veiculo: "GM CELTA 1.0 SPIRIT 4P - REPASSE", ano: "2005/2005", cor: "BRANCA", placa: "IMG8I16", fipe: 16736, preco: 17900, repasse: 17900, isRepasse: true, opcionas: "BÁSICO", proprietario: "RENATO", km: "219.150", adCustom: "" },
             { id: 3, veiculo: "CORSA SEDAN CLASSIC 1.0 - REPASSE", ano: "2008/2008", cor: "BRANCO", placa: "IOU6277", fipe: 17921, preco: 18900, repasse: 18900, isRepasse: true, opcionas: "C/ AR", proprietario: "RENATO", km: "", adCustom: "" },
-            { id: 4, veiculo: "FORD/COURIER L 1.6 FLEX", ano: "2009/2009", cor: "BRANCA", placa: "IPO7D36", fipe: 31316, preco: 28900, repasse: 28900, isRepasse: true, opcionas: "D/ Hidráulica", proprietario: "RENATO", km: "", adCustom: "" },
+            { id: 4, veiculo: "FORD/COURIER L 1.6 FLEX", ano: "2009/2009", cor: "BRANCA", placa: "IPO7D36", fipe: 31316, preco: 28900, repasse: 28900, isRepasse: true, opcionas: "D/ HIDRÁULICA", proprietario: "RENATO", km: "", adCustom: "" },
             { id: 5, veiculo: "FIAT/SIENA 1.4 ELX FIRE 8V", ano: "2008/2009", cor: "PRETA", placa: "MFF9736", fipe: 26396, preco: 30900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "111.700", adCustom: "" },
             { id: 6, veiculo: "UNO VIVACE 1.0", ano: "2010/2011", cor: "BRANCO", placa: "IQW8C23", fipe: 27739, preco: 32900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "109.000", adCustom: "" },
             { id: 7, veiculo: "UNO VIVACE 1.0 5P", ano: "2011/2012", cor: "PRATA", placa: "HHU5867", fipe: 29044, preco: 32900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RENATO", km: "110.200", adCustom: "" },
@@ -326,4 +337,295 @@
             { id: 37, veiculo: "KICKS SV 1.6 AUT", ano: "2020/2021", cor: "BRANCO", placa: "JAN2E81", fipe: 85960, preco: 85900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "74.945", adCustom: "" },
             { id: 38, veiculo: "FIAT/FIORINO ENDURANCE 1.4 8V", ano: "2022/2022", cor: "BRANCA", placa: "JDE5H21", fipe: 79686, preco: 86900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "49.000", adCustom: "" },
             { id: 39, veiculo: "CRUZE SPORT LTZ 1.4 AUT / VECTRA", ano: "2016/2017", cor: "AZUL", placa: "FTI5I60", fipe: 84614, preco: 100900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "ZERADO", adCustom: "" },
-            { id: 40,
+            { id: 40, veiculo: "ONIX PLUS PREMIER 1.0 AUT", ano: "/2025", cor: "PRETO", placa: "JCT0D57", fipe: 95900, preco: 107900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "29.966", adCustom: "" },
+            { id: 41, veiculo: "HILUX CD SRX PLUS 4X4 2.8", ano: "/2025", cor: "BRANCO", placa: "JDA1I58", fipe: 272795, preco: 294900, repasse: null, isRepasse: false, opcionas: "COMPLETO", proprietario: "RAFAEL", km: "102.700", adCustom: "" }
+        ];
+
+        let vehicles = [], currentVehicleForAd = null, sortAscending = true;
+
+        function loadVehicles() {
+            const stored = localStorage.getItem('vehicles_data_v2');
+            if (stored) {
+                try { vehicles = JSON.parse(stored); } catch(e) { vehicles = defaultVehicles; }
+            } else {
+                vehicles = JSON.parse(JSON.stringify(defaultVehicles));
+                saveToLocal();
+            }
+            sortAndRender();
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('vehicles_data_v2', JSON.stringify(vehicles));
+        }
+
+        function closeModal() {
+            document.getElementById('vehicle-modal').classList.add('hidden');
+        }
+
+        function openModal(id = null) {
+            document.getElementById('vehicle-form').reset();
+            document.getElementById('vehicle-id').value = '';
+            handleOpcionasSelectChange('COMPLETO');
+
+            if (id) {
+                document.getElementById('modal-title').innerText = 'Editar Veículo';
+                const vehicle = vehicles.find(v => v.id === id);
+                if (vehicle) {
+                    document.getElementById('vehicle-id').value = vehicle.id;
+                    document.getElementById('input-veiculo').value = vehicle.veiculo;
+                    document.getElementById('input-ano').value = vehicle.ano;
+                    document.getElementById('input-cor').value = vehicle.cor;
+                    document.getElementById('input-placa').value = vehicle.placa || '';
+                    document.getElementById('input-fipe').value = (vehicle.fipe || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    document.getElementById('input-preco').value = (vehicle.preco || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    if (vehicle.repasse) document.getElementById('input-repasse').value = Number(vehicle.repasse).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                    document.getElementById('input-is-repasse').checked = !!vehicle.isRepasse;
+                    toggleRepasseInput(!!vehicle.isRepasse);
+                    
+                    const optSelect = document.getElementById('input-opcionas-select');
+                    const knownOpts = ['COMPLETO', 'BÁSICO', 'C/ AR', 'D/ HIDRÁULICA'];
+                    const currentOpt = (vehicle.opcionas || '').toUpperCase();
+                    if (knownOpts.includes(currentOpt)) { optSelect.value = currentOpt; handleOpcionasSelectChange(currentOpt); }
+                    else { optSelect.value = 'OUTRO'; handleOpcionasSelectChange('OUTRO'); document.getElementById('input-opcionas-custom').value = currentOpt; }
+                    document.getElementById('input-proprietario').value = vehicle.proprietario || 'RENATO';
+                    document.getElementById('input-km').value = vehicle.km || '';
+                }
+            } else {
+                document.getElementById('modal-title').innerText = 'Adicionar Novo Veículo';
+                document.getElementById('input-is-repasse').checked = false;
+                toggleRepasseInput(false);
+            }
+            document.getElementById('vehicle-modal').classList.remove('hidden');
+        }
+
+        function toggleRepasseInput(checked) {
+            const repasseContainer = document.getElementById('container-repasse-val');
+            if (repasseContainer) {
+                if (checked) repasseContainer.classList.remove('hidden');
+                else {
+                    repasseContainer.classList.add('hidden');
+                    document.getElementById('input-repasse').value = '';
+                }
+            }
+        }
+
+        function formatAnoInput(input) {
+            let digits = input.value.replace(/\D/g, '');
+            if (digits.length > 8) digits = digits.substring(0, 8);
+            input.value = digits.length > 4 ? digits.substring(0, 4) + '/' + digits.substring(4) : digits;
+        }
+
+        function formatCurrencyInput(input) {
+            let digits = input.value.replace(/\D/g, '');
+            if (!digits) { input.value = ''; return; }
+            input.value = (parseFloat(digits) / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function parseCurrencyValue(strValue) {
+            if (!strValue) return 0;
+            return parseFloat(String(strValue).replace(/\./g, '').replace(',', '.')) || 0;
+        }
+
+        function formatCurrency(val) {
+            if (val === null || val === undefined || isNaN(val)) return 'R$ 0,00';
+            return Number(val).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function handleOpcionasSelectChange(val) {
+            const customInput = document.getElementById('input-opcionas-custom');
+            if (customInput) {
+                if (val === 'OUTRO') { customInput.classList.remove('hidden'); customInput.required = true; }
+                else { customInput.classList.add('hidden'); customInput.required = false; customInput.value = ''; }
+            }
+        }
+
+        function saveVehicle(event) {
+            event.preventDefault();
+            const id = document.getElementById('vehicle-id').value;
+            const isRepasseChecked = document.getElementById('input-is-repasse').checked;
+            const optSelectVal = document.getElementById('input-opcionas-select').value;
+            const finalOpcionas = optSelectVal === 'OUTRO' ? document.getElementById('input-opcionas-custom').value.toUpperCase() : optSelectVal;
+
+            const vehicleData = {
+                id: id ? Number(id) : (vehicles.length > 0 ? Math.max(...vehicles.map(v => v.id)) + 1 : 1),
+                veiculo: document.getElementById('input-veiculo').value.toUpperCase(),
+                ano: document.getElementById('input-ano').value.toUpperCase(),
+                cor: document.getElementById('input-cor').value.toUpperCase(),
+                placa: document.getElementById('input-placa').value.toUpperCase(),
+                fipe: parseCurrencyValue(document.getElementById('input-fipe').value),
+                preco: parseCurrencyValue(document.getElementById('input-preco').value),
+                isRepasse: isRepasseChecked,
+                repasse: isRepasseChecked && document.getElementById('input-repasse').value ? parseCurrencyValue(document.getElementById('input-repasse').value) : null,
+                opcionas: finalOpcionas,
+                proprietario: document.getElementById('input-proprietario').value.toUpperCase(),
+                km: document.getElementById('input-km').value.toUpperCase(),
+                adCustom: id ? (vehicles.find(v => v.id === Number(id))?.adCustom || "") : ""
+            };
+
+            if (id) {
+                const index = vehicles.findIndex(v => v.id === Number(id));
+                if (index !== -1) vehicles[index] = vehicleData;
+            } else {
+                vehicles.push(vehicleData);
+            }
+
+            saveToLocal();
+            sortAndRender();
+            closeModal();
+        }
+
+        function editVehicle(id) { openModal(id); }
+
+        function deleteVehicle(id) {
+            if (confirm("Tem certeza que deseja excluir este veículo?")) {
+                vehicles = vehicles.filter(v => v.id !== id);
+                saveToLocal();
+                sortAndRender();
+            }
+        }
+
+        function resetDefaultData() {
+            if (confirm("Deseja restaurar a lista original de veículos?")) {
+                vehicles = JSON.parse(JSON.stringify(defaultVehicles));
+                saveToLocal();
+                sortAndRender();
+            }
+        }
+
+        function toggleSortPrice() {
+            sortAscending = !sortAscending;
+            const icon = document.getElementById('sort-icon');
+            if (icon) icon.className = sortAscending ? "fa-solid fa-arrow-up-wide-short text-rose-400 ml-1" : "fa-solid fa-arrow-down-wide-short text-rose-400 ml-1";
+            sortAndRender();
+        }
+
+        function sortAndRender() {
+            vehicles.sort((a, b) => sortAscending ? a.preco - b.preco : b.preco - a.preco);
+            filterVehicles();
+        }
+
+        function filterVehicles() {
+            const searchTerm = document.getElementById('search-input')?.value.toLowerCase() || '';
+            const propFilter = document.getElementById('filter-proprietario')?.value || '';
+            const optFilter = document.getElementById('filter-options')?.value || '';
+            const repasseFilter = document.getElementById('filter-repasse')?.value || '';
+
+            const filtered = vehicles.filter(v => {
+                const matchesSearch = !searchTerm || v.veiculo.toLowerCase().includes(searchTerm) || (v.placa && v.placa.toLowerCase().includes(searchTerm)) || v.cor.toLowerCase().includes(searchTerm);
+                const matchesProp = !propFilter || v.proprietario === propFilter;
+                const matchesOpt = !optFilter || v.opcionas.toUpperCase().includes(optFilter.toUpperCase());
+                let matchesRepasse = true;
+                if (repasseFilter === 'with') matchesRepasse = !!v.isRepasse;
+                if (repasseFilter === 'without') matchesRepasse = !v.isRepasse;
+                return matchesSearch && matchesProp && matchesOpt && matchesRepasse;
+            });
+
+            renderTable(filtered);
+            updateStats();
+        }
+
+        function renderTable(dataList) {
+            const tbody = document.getElementById('vehicle-table-body');
+            const noResults = document.getElementById('no-results');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (dataList.length === 0) { if (noResults) noResults.classList.remove('hidden'); return; }
+            else { if (noResults) noResults.classList.add('hidden'); }
+
+            dataList.forEach((v, index) => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-zinc-800/50 transition duration-150 group";
+                let ownerBadgeClass = "bg-zinc-800 text-zinc-300 border-zinc-700";
+                if (v.proprietario === 'CONSIGNADO') ownerBadgeClass = "bg-purple-950/80 text-purple-300 border-purple-800/60";
+                else if (v.proprietario === 'RENATO') ownerBadgeClass = "bg-blue-950/80 text-blue-300 border-blue-800/60";
+                else if (v.proprietario === 'RAFAEL') ownerBadgeClass = "bg-amber-950/80 text-amber-300 border-amber-800/60";
+
+                row.innerHTML = `
+                    <td class="py-3 px-4 text-center font-mono text-zinc-500 font-semibold">${index + 1}</td>
+                    <td class="py-3 px-4 font-semibold text-zinc-100 cursor-pointer hover:text-rose-400 transition" onclick="openAdModal(${v.id})" title="Abrir Anúncio">
+                        <div class="flex items-center space-x-2">
+                            <span>${v.veiculo}</span>
+                            <i class="fa-solid fa-bullhorn text-xs text-rose-500 opacity-0 group-hover:opacity-100 transition"></i>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 text-center font-mono text-xs text-zinc-300">${v.ano}</td>
+                    <td class="py-3 px-4 text-center text-xs text-zinc-300">${v.cor}</td>
+                    <td class="py-3 px-4 text-center font-mono text-xs font-bold text-zinc-200">${v.placa || '-'}</td>
+                    <td class="py-3 px-4 text-right font-mono text-xs text-zinc-400">${formatCurrency(v.fipe)}</td>
+                    <td class="py-3 px-4 text-right font-mono text-sm font-bold text-emerald-400">${formatCurrency(v.preco)}</td>
+                    <td class="py-3 px-4 text-right font-mono text-xs">${v.isRepasse ? `<span class="text-rose-400 font-bold bg-rose-950/60 px-2 py-0.5 rounded border border-rose-800/40">${formatCurrency(v.repasse || v.preco)}</span>` : '<span class="text-zinc-600">-</span>'}</td>
+                    <td class="py-3 px-4 text-center text-xs font-medium text-zinc-300">${v.opcionas}</td>
+                    <td class="py-3 px-4 text-center"><span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border ${ownerBadgeClass}">${v.proprietario || 'N/A'}</span></td>
+                    <td class="py-3 px-4 text-right font-mono text-xs text-zinc-400">${v.km || '-'}</td>
+                    <td class="py-3 px-4 text-center print:hidden">
+                        <div class="flex items-center justify-center space-x-2">
+                            <button onclick="editVehicle(${v.id})" class="text-zinc-400 hover:text-rose-400 p-1.5 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteVehicle(${v.id})" class="text-zinc-400 hover:text-rose-600 p-1.5 transition"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = vehicles.length;
+            const sumPrice = vehicles.reduce((acc, v) => acc + (v.preco || 0), 0);
+            document.getElementById('stat-avg-price').innerText = formatCurrency(vehicles.length > 0 ? sumPrice / vehicles.length : 0);
+            document.getElementById('stat-repasse').innerText = vehicles.filter(v => v.isRepasse).length;
+            document.getElementById('stat-consignados').innerText = vehicles.filter(v => v.proprietario === 'CONSIGNADO').length;
+        }
+
+        function openAdModal(id) {
+            currentVehicleForAd = vehicles.find(v => v.id === id);
+            if (!currentVehicleForAd) return;
+            document.getElementById('ad-modal-title').innerText = `Anúncio: ${currentVehicleForAd.veiculo}`;
+            document.getElementById('ad-text-area').value = currentVehicleForAd.adCustom || generateDefaultAdText(currentVehicleForAd);
+            document.getElementById('ad-modal').classList.remove('hidden');
+        }
+
+        function closeAdModal() {
+            document.getElementById('ad-modal').classList.add('hidden');
+            currentVehicleForAd = null;
+        }
+
+        function generateDefaultAdText(v) {
+            return `🚗 ${v.veiculo}\n📅 Ano: ${v.ano}\n🎨 Cor: ${v.cor}\n⚡ Opções: ${v.opcionas}\n🛣️ KM: ${v.km || 'Consulte'}\n💰 Valor: ${formatCurrency(v.preco)}\n${v.isRepasse ? `🔥 REPASSE: ${formatCurrency(v.repasse || v.preco)}\n` : ''}📍 Placa: ${v.placa || 'Consulte'}\n✅ Aceitamos trocas e financiamento!`;
+        }
+
+        function saveAdTemplateCustom() {
+            if (!currentVehicleForAd) return;
+            const newText = document.getElementById('ad-text-area').value;
+            currentVehicleForAd.adCustom = newText;
+            saveToLocal();
+            alert("Anúncio guardado com sucesso!");
+        }
+
+        function copyAdText() {
+            const textArea = document.getElementById('ad-text-area');
+            textArea.select();
+            document.execCommand('copy');
+            alert("Texto copiado!");
+        }
+
+        function printTable() { window.print(); }
+
+        function exportData() {
+            let csvContent = "\uFEFF#;Veículo;Ano;Cor;Placa;Fipe;Preço;É Repasse?;Valor Repasse;Opções;Proprietário;KM\r\n";
+            vehicles.forEach((v, i) => {
+                csvContent += [i + 1, `"${v.veiculo}"`, v.ano, v.cor, v.placa, (v.fipe || 0), (v.preco || 0), v.isRepasse ? "SIM" : "NÃO", v.repasse || '', `"${v.opcionas}"`, `"${v.proprietario || ''}"`, `"${v.km || ''}"`].join(";") + "\r\n";
+            });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }));
+            link.download = `estoque_veiculos.csv`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('current-date-label').innerText = `ATUALIZADO ${new Date().toLocaleDateString('pt-BR')}`;
+            loadVehicles();
+        });
+    </script>
+</body>
+</html>
